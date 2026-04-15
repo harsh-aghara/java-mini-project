@@ -1,0 +1,4 @@
+*.class
+expenses.csv
+budget.txt
+.gemini/
