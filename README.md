@@ -1,8 +1,8 @@
-# Expense Tracker CLI 📊
+# Expense Tracker CLI 
 
 A lightweight, persistent, and feature-rich Command Line Interface (CLI) application built with Java for managing personal finances. This project was developed as part of a Java Lab Mini Project.
 
-## 🚀 Features
+## Features
 
 -   **Full CRUD Operations**: Add, View, Update, and Delete expenses.
 -   **Persistent Storage**: All data is saved to `expenses.csv` and `budget.txt` files, ensuring it remains available across sessions.
@@ -11,7 +11,7 @@ A lightweight, persistent, and feature-rich Command Line Interface (CLI) applica
 -   **Sorting**: Organize your expenses by **Date** or **Amount**.
 -   **Input Validation**: Robust error handling for invalid data types (e.g., non-numeric amounts).
 
-## 🏗️ Architecture
+## Architecture
 
 The application follows a modular architecture to ensure separation of concerns:
 
@@ -20,12 +20,12 @@ The application follows a modular architecture to ensure separation of concerns:
 -   **`Expense.java` (Model Layer)**: Represents the data structure for an expense, including CSV serialization/deserialization logic.
 -   **`FileHandler.java` (Data Access Layer)**: Manages low-level file I/O operations for both expenses and budget persistence.
 
-## 📋 Prerequisites
+## Prerequisites
 
 -   **Java Development Kit (JDK)**: Version 8 or higher is required.
 -   **Git**: For cloning the repository.
 
-## ⚙️ Installation & Running
+## Installation & Running
 
 1.  **Clone the Repository**:
     ```bash
