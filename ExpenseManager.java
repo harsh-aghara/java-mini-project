@@ -4,67 +4,56 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/** Service layer — all business logic for expenses and budget. */
 public class ExpenseManager {
-    private List<Expense> expenses;
-    private int nextId;
-    private double monthlyBudget;
+
+    private final List<Expense> expenses;
+    private       int           nextId;
+    private       double        monthlyBudget;
 
     public ExpenseManager() {
-        this.expenses = FileHandler.loadExpenses();
+        this.expenses      = FileHandler.loadExpenses();
         this.monthlyBudget = FileHandler.loadBudget();
-        this.nextId = calculateNextId();
+        this.nextId        = expenses.stream().mapToInt(Expense::getId).max().orElse(0) + 1;
     }
 
-    private int calculateNextId() {
-        return expenses.stream()
-                .mapToInt(Expense::getId)
-                .max()
-                .orElse(0) + 1;
+    private void save() { FileHandler.saveExpenses(expenses); }
+
+    // ── Lookup ────────────────────────────────────────────────────────────────
+    public Expense findById(int id) {
+        return expenses.stream().filter(e -> e.getId() == id).findFirst().orElse(null);
     }
 
+    // ── CRUD ──────────────────────────────────────────────────────────────────
     public void addExpense(double amount, String category, String description) {
-        Expense expense = new Expense(nextId++, amount, category, LocalDate.now(), description);
-        expenses.add(expense);
+        expenses.add(new Expense(nextId++, amount, category, LocalDate.now(), description));
         save();
     }
 
     public boolean updateExpense(int id, double amount, String category, String description) {
-        for (Expense e : expenses) {
-            if (e.getId() == id) {
-                e.setAmount(amount);
-                e.setCategory(category);
-                e.setDescription(description);
-                save();
-                return true;
-            }
-        }
-        return false;
+        Expense e = findById(id);
+        if (e == null) return false;
+        e.setAmount(amount);
+        e.setCategory(Validator.sanitize(category));
+        e.setDescription(Validator.sanitize(description));
+        save();
+        return true;
     }
 
     public boolean removeExpense(int id) {
         boolean removed = expenses.removeIf(e -> e.getId() == id);
-        if (removed) {
-            save();
-        }
+        if (removed) save();
         return removed;
     }
 
-    public List<Expense> getAllExpenses() {
-        return new ArrayList<>(expenses);
-    }
+    // ── Queries ───────────────────────────────────────────────────────────────
+    public List<Expense> getAllExpenses() { return new ArrayList<>(expenses); }
 
     public List<Expense> getSortedExpenses(String sortBy) {
-        Comparator<Expense> comparator;
-        switch (sortBy.toLowerCase()) {
-            case "amount":
-                comparator = Comparator.comparingDouble(Expense::getAmount);
-                break;
-            case "date":
-            default:
-                comparator = Comparator.comparing(Expense::getDate);
-                break;
-        }
-        return expenses.stream().sorted(comparator).collect(Collectors.toList());
+        Comparator<Expense> cmp = sortBy.equalsIgnoreCase("amount")
+                ? Comparator.comparingDouble(Expense::getAmount)
+                : Comparator.comparing(Expense::getDate);
+        return expenses.stream().sorted(cmp).collect(Collectors.toList());
     }
 
     public List<Expense> getExpensesByMonth(int month, int year) {
@@ -79,29 +68,14 @@ public class ExpenseManager {
                 .collect(Collectors.toList());
     }
 
-    public double calculateTotalExpenses() {
-        return expenses.stream().mapToDouble(Expense::getAmount).sum();
-    }
+    // ── Calculations ──────────────────────────────────────────────────────────
+    public double calculateTotalExpenses()              { return expenses.stream().mapToDouble(Expense::getAmount).sum(); }
+    public double calculateMonthlyTotal(int month, int year) { return getExpensesByMonth(month, year).stream().mapToDouble(Expense::getAmount).sum(); }
 
-    public double calculateMonthlyTotal(int month, int year) {
-        return getExpensesByMonth(month, year).stream().mapToDouble(Expense::getAmount).sum();
-    }
-
-    public void setMonthlyBudget(double budget) {
-        this.monthlyBudget = budget;
-        FileHandler.saveBudget(budget);
-    }
-
-    public double getMonthlyBudget() {
-        return monthlyBudget;
-    }
-
-    public double getRemainingBudget() {
+    public void   setMonthlyBudget(double b)  { this.monthlyBudget = b; FileHandler.saveBudget(b); }
+    public double getMonthlyBudget()          { return monthlyBudget; }
+    public double getRemainingBudget()        {
         LocalDate now = LocalDate.now();
         return monthlyBudget - calculateMonthlyTotal(now.getMonthValue(), now.getYear());
-    }
-
-    private void save() {
-        FileHandler.saveExpenses(expenses);
     }
 }

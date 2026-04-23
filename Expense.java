@@ -1,82 +1,98 @@
 import java.time.LocalDate;
 
-public class Expense {
-    private int id;
-    private double amount;
-    private String category;
-    private LocalDate date;
-    private String description;
+/**
+ * INHERITANCE USED:
+ *
+ *  Single     : Expense extends AbstractExpense  (one direct parent)
+ *  Multiple   : Expense satisfies TWO interfaces simultaneously --
+ *                 Persistable  (inherited from AbstractExpense)
+ *                 Taggable     (implemented directly here)
+ *               Java achieves multiple inheritance through interfaces only.
+ *
+ *  Hierarchy:
+ *    Persistable (interface)    Taggable (interface)
+ *          |                        |
+ *    AbstractExpense (abstract)     |
+ *          |                        |
+ *          +------------------------+
+ *                    |
+ *                 Expense  <-- concrete, satisfies both interfaces
+ */
+public class Expense extends AbstractExpense implements Taggable {
 
-    public Expense(int id, double amount, String category, LocalDate date, String description) {
-        this.id = id;
-        this.amount = amount;
-        this.category = category;
-        this.date = date;
-        this.description = description;
+    // ── Static ────────────────────────────────────────────────────────────────
+    private static int totalCreated = 0;
+
+    // Column widths for table display
+    private static final int W_ID   = 4;
+    private static final int W_AMT  = 16;   // "INR " + 12-char number
+    private static final int W_CAT  = 12;
+    private static final int W_DATE = 10;
+
+    public static final String TABLE_HEADER =
+        String.format("%-" + W_ID + "s | %-" + W_AMT + "s | %-" + W_CAT + "s | %-" + W_DATE + "s | %s",
+                      "ID", "Amount (INR)", "Category", "Date", "Description");
+
+    public static final String TABLE_DIVIDER = buildDivider();
+
+    // ── Constructor ───────────────────────────────────────────────────────────
+    public Expense(int id, double amount, String category,
+                   LocalDate date, String description) {
+        super(id, amount, Validator.sanitize(category), date, Validator.sanitize(description));
+        totalCreated++;
     }
 
-    public int getId() {
-        return id;
+    // ── Static helpers ────────────────────────────────────────────────────────
+    public static int    getTotalCreated() { return totalCreated; }
+
+    private static String buildDivider() {
+        return TABLE_HEADER.replace(" | ", "-+-").replaceAll("[^+]", "-");
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
+    // ── Persistable (toCSVString + getSummary) ────────────────────────────────
+    @Override
     public String toCSVString() {
-        return id + "," + amount + "," + category + "," + date + "," + description;
+        return getId() + "," + getAmount() + "," + getCategory()
+                + "," + getDate() + "," + getDescription();
     }
 
+    @Override
+    public String getSummary() {
+        String amtStr = String.format("INR %,12.2f", getAmount());   // always 16 chars
+        return String.format("%" + W_ID + "d | %-" + W_AMT + "s | %-" + W_CAT + "s | %"
+                + W_DATE + "s | %s",
+                getId(), amtStr, getCategory(), getDate(), getDescription());
+    }
+
+    // ── Taggable ──────────────────────────────────────────────────────────────
+    @Override
+    public String getTag() {
+        String c = getCategory().toLowerCase();
+        if (c.contains("food") || c.contains("eat"))     return "[FOOD]";
+        if (c.contains("travel") || c.contains("fuel"))  return "[TRAVEL]";
+        if (c.contains("gym") || c.contains("health"))   return "[HEALTH]";
+        if (c.contains("bill") || c.contains("util"))    return "[BILLS]";
+        if (c.contains("sub"))                           return "[SUB]";
+        return "[OTHER]";
+    }
+
+    // ── Factory ───────────────────────────────────────────────────────────────
     public static Expense fromCSVString(String csvLine) {
+        if (csvLine == null || csvLine.trim().isEmpty()) return null;
         String[] parts = csvLine.split(",");
         if (parts.length != 5) return null;
         try {
-            int id = Integer.parseInt(parts[0]);
-            double amount = Double.parseDouble(parts[1]);
-            String category = parts[2];
-            LocalDate date = LocalDate.parse(parts[3]);
-            String description = parts[4];
-            return new Expense(id, amount, category, date, description);
+            return new Expense(
+                Integer.parseInt(parts[0].trim()),
+                Double.parseDouble(parts[1].trim()),
+                parts[2].trim(),
+                LocalDate.parse(parts[3].trim()),
+                parts[4].trim()
+            );
         } catch (Exception e) {
             return null;
         }
     }
 
-    @Override
-    public String toString() {
-        return String.format("ID: %d | Amount: %.2f | Category: %-10s | Date: %s | Description: %s",
-                id, amount, category, date, description);
-    }
+    @Override public String toString() { return getSummary(); }
 }
