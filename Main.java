@@ -23,6 +23,7 @@ public class Main {
                 case 8: viewByCategory(); break;
                 case 9:
                     System.out.println("Exiting... Goodbye!");
+                    scanner.close();
                     return;
                 default:
                     System.out.println("Invalid choice. Please try again.");

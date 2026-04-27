@@ -16,6 +16,7 @@ public class ExpenseManager {
     }
 
     private int calculateNextId() {
+        // Find the highest existing ID, or start at 1 if no expenses exist
         return expenses.stream()
                 .mapToInt(Expense::getId)
                 .max()

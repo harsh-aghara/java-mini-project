@@ -60,7 +60,8 @@ public class Expense {
     }
 
     public static Expense fromCSVString(String csvLine) {
-        String[] parts = csvLine.split(",");
+        // Split into max 5 parts to handle commas in description
+        String[] parts = csvLine.split(",", 5);
         if (parts.length != 5) return null;
         try {
             int id = Integer.parseInt(parts[0]);
