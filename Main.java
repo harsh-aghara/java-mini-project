@@ -27,7 +27,7 @@ public class Main {
         }
     }
 
-    // ── Menu ──────────────────────────────────────────────────────────────────
+    //  Menu 
     private static void printMenu() {
         System.out.println("\n1. Add Expense");
         System.out.println("2. View All Expenses");
@@ -40,7 +40,7 @@ public class Main {
         System.out.println("9. Exit");
     }
 
-    // ── Expense actions ───────────────────────────────────────────────────────
+    //  Expense actions 
     private static void addExpense() {
         double amount = readPositiveAmount();
         if (amount < 0) return;
@@ -70,7 +70,7 @@ public class Main {
                 : "Error: ID " + id + " not found.");
     }
 
-    // ── View actions ──────────────────────────────────────────────────────────
+    //  View actions 
     private static void viewAllExpenses() {
         displayList(manager.getAllExpenses(), "All Expenses");
         System.out.printf("Grand Total: INR %,12.2f%n", manager.calculateTotalExpenses());
@@ -94,7 +94,7 @@ public class Main {
         displayList(manager.getExpensesByCategory(category), "Category: " + category);
     }
 
-    // ── Budget ────────────────────────────────────────────────────────────────
+    //  Budget 
     private static void manageBudget() {
         printBudgetStatus();
         System.out.println("\n1. Set/Update Budget  2. Return");
@@ -123,7 +123,7 @@ public class Main {
             System.out.printf("WARNING: Over budget by INR %,.2f!%n", Math.abs(manager.getRemainingBudget()));
     }
 
-    // ── Display ───────────────────────────────────────────────────────────────
+    //  Display 
     private static void displayList(List<Expense> expenses, String title) {
         System.out.println("\n--- " + title + " ---");
         if (expenses.isEmpty()) { System.out.println("No records found."); return; }
@@ -132,7 +132,7 @@ public class Main {
         expenses.forEach(e -> System.out.println(e.getSummary()));
     }
 
-    // ── Input helpers ─────────────────────────────────────────────────────────
+    //  Input helpers 
     private static int readInt(String prompt) {
         while (true) {
             System.out.print(prompt);

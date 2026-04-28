@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** Service layer — all business logic for expenses and budget. */
 public class ExpenseManager {
 
     private final List<Expense> expenses;
@@ -19,12 +18,12 @@ public class ExpenseManager {
 
     private void save() { FileHandler.saveExpenses(expenses); }
 
-    // ── Lookup ────────────────────────────────────────────────────────────────
+    //  Lookup 
     public Expense findById(int id) {
         return expenses.stream().filter(e -> e.getId() == id).findFirst().orElse(null);
     }
 
-    // ── CRUD ──────────────────────────────────────────────────────────────────
+    //  CRUD 
     public void addExpense(double amount, String category, String description) {
         expenses.add(new Expense(nextId++, amount, category, LocalDate.now(), description));
         save();
@@ -46,7 +45,7 @@ public class ExpenseManager {
         return removed;
     }
 
-    // ── Queries ───────────────────────────────────────────────────────────────
+    //  Queries 
     public List<Expense> getAllExpenses() { return new ArrayList<>(expenses); }
 
     public List<Expense> getSortedExpenses(String sortBy) {
@@ -68,7 +67,7 @@ public class ExpenseManager {
                 .collect(Collectors.toList());
     }
 
-    // ── Calculations ──────────────────────────────────────────────────────────
+    //  Calculations 
     public double calculateTotalExpenses()              { return expenses.stream().mapToDouble(Expense::getAmount).sum(); }
     public double calculateMonthlyTotal(int month, int year) { return getExpensesByMonth(month, year).stream().mapToDouble(Expense::getAmount).sum(); }
 

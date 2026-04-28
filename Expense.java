@@ -1,26 +1,8 @@
 import java.time.LocalDate;
 
-/**
- * INHERITANCE USED:
- *
- *  Single     : Expense extends AbstractExpense  (one direct parent)
- *  Multiple   : Expense satisfies TWO interfaces simultaneously --
- *                 Persistable  (inherited from AbstractExpense)
- *                 Taggable     (implemented directly here)
- *               Java achieves multiple inheritance through interfaces only.
- *
- *  Hierarchy:
- *    Persistable (interface)    Taggable (interface)
- *          |                        |
- *    AbstractExpense (abstract)     |
- *          |                        |
- *          +------------------------+
- *                    |
- *                 Expense  <-- concrete, satisfies both interfaces
- */
 public class Expense extends AbstractExpense implements Taggable {
 
-    // ── Static ────────────────────────────────────────────────────────────────
+    //  Static 
     private static int totalCreated = 0;
 
     // Column widths for table display
@@ -35,21 +17,21 @@ public class Expense extends AbstractExpense implements Taggable {
 
     public static final String TABLE_DIVIDER = buildDivider();
 
-    // ── Constructor ───────────────────────────────────────────────────────────
+    //  Constructor 
     public Expense(int id, double amount, String category,
                    LocalDate date, String description) {
         super(id, amount, Validator.sanitize(category), date, Validator.sanitize(description));
         totalCreated++;
     }
 
-    // ── Static helpers ────────────────────────────────────────────────────────
+    //  Static helpers 
     public static int    getTotalCreated() { return totalCreated; }
 
     private static String buildDivider() {
         return TABLE_HEADER.replace(" | ", "-+-").replaceAll("[^+]", "-");
     }
 
-    // ── Persistable (toCSVString + getSummary) ────────────────────────────────
+    //  Persistable (toCSVString + getSummary) 
     @Override
     public String toCSVString() {
         return getId() + "," + getAmount() + "," + getCategory()
@@ -64,7 +46,7 @@ public class Expense extends AbstractExpense implements Taggable {
                 getId(), amtStr, getCategory(), getDate(), getDescription());
     }
 
-    // ── Taggable ──────────────────────────────────────────────────────────────
+    //  Taggable 
     @Override
     public String getTag() {
         String c = getCategory().toLowerCase();
@@ -76,7 +58,7 @@ public class Expense extends AbstractExpense implements Taggable {
         return "[OTHER]";
     }
 
-    // ── Factory ───────────────────────────────────────────────────────────────
+    //  Factory
     public static Expense fromCSVString(String csvLine) {
         if (csvLine == null || csvLine.trim().isEmpty()) return null;
         // Limit split to 5 parts to handle commas in the description

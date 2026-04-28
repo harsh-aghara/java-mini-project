@@ -2,7 +2,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Static utility for reading and writing expenses.csv and budget.txt. */
 public class FileHandler {
 
     private static final String EXPENSES_FILE = "expenses.csv";
