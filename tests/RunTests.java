@@ -122,8 +122,8 @@ public class RunTests {
                 Expense.fromCSVString("   ") != null);
         assertFalse("B24 too few columns returns null",
                 Expense.fromCSVString("1,250.0,Food,2026-04-22") != null);
-        assertFalse("B25 too many columns returns null",
-                Expense.fromCSVString("1,250.0,Food,2026-04-22,Dinner,Extra") != null);
+        assertTrue("B25 extra commas in description are supported",
+                Expense.fromCSVString("1,250.0,Food,2026-04-22,Dinner, with wine") != null);
         assertFalse("B26 non-numeric amount returns null",
                 Expense.fromCSVString("1,abc,Food,2026-04-22,Dinner") != null);
         assertFalse("B27 non-numeric id returns null",
